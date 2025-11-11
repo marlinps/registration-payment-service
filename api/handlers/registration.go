@@ -26,57 +26,57 @@ func CreateNewRegistration(service *registration.RegistrationService) func(c *fi
 	}
 }
 
-func LoadAllRegistrations(service *registration.RegistrationService) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		registrations, err := service.GetAllRegistrations()
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to load registrations",
-			})
-		}
-		return c.JSON(fiber.Map{
-			"data": registrations,
-		})
-	}
-}
+// func LoadAllRegistrations(service *registration.RegistrationService) func(c *fiber.Ctx) error {
+// 	return func(c *fiber.Ctx) error {
+// 		registrations, err := service.GetAllRegistrations()
+// 		if err != nil {
+// 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 				"error": "Failed to load registrations",
+// 			})
+// 		}
+// 		return c.JSON(fiber.Map{
+// 			"data": registrations,
+// 		})
+// 	}
+// }
 
-func LoadRegistrationByID(service *registration.RegistrationService) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		registrationID := c.Params("id")
-		registration, err := service.GetRegistrationByID(registrationID)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to load registration",
-			})
-		}
-		return c.JSON(registration)
-	}
-}
-func UpdateRegistrationByID(service *registration.RegistrationService) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		registrationID := c.Params("id")
-		registration, err := service.UpdateRegistrationByID(registrationID)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to update registration",
-			})
-		}
+// func LoadRegistrationByID(service *registration.RegistrationService) func(c *fiber.Ctx) error {
+// 	return func(c *fiber.Ctx) error {
+// 		registrationID := c.Params("id")
+// 		registration, err := service.GetRegistrationByID(registrationID)
+// 		if err != nil {
+// 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 				"error": "Failed to load registration",
+// 			})
+// 		}
+// 		return c.JSON(registration)
+// 	}
+// }
+// func UpdateRegistrationByID(service *registration.RegistrationService) func(c *fiber.Ctx) error {
+// 	return func(c *fiber.Ctx) error {
+// 		registrationID := c.Params("id")
+// 		registration, err := service.UpdateRegistrationByID(registrationID)
+// 		if err != nil {
+// 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 				"error": "Failed to update registration",
+// 			})
+// 		}
 
-		return c.JSON(registration)
-	}
-}
+// 		return c.JSON(registration)
+// 	}
+// }
 
-func CancelRegistration(service *registration.RegistrationService) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		registrationID := c.Params("id")
-		err := service.CancelRegistration(registrationID)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to cancel registration",
-			})
-		}
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "Registration deleted successfully",
-		})
-	}
-}
+// func CancelRegistration(service *registration.RegistrationService) func(c *fiber.Ctx) error {
+// 	return func(c *fiber.Ctx) error {
+// 		registrationID := c.Params("id")
+// 		err := service.CancelRegistration(registrationID)
+// 		if err != nil {
+// 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 				"error": "Failed to cancel registration",
+// 			})
+// 		}
+// 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+// 			"message": "Registration deleted successfully",
+// 		})
+// 	}
+// }
