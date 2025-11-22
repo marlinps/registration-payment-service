@@ -2,6 +2,7 @@ package registration
 
 import "github.com/marlinps/registration-payment-service/pkg/entities"
 
+
 type RegistrationRepo interface {
 	Create(registration entities.Registration) error
 	// GetAll() ([]entities.Registration, error)
