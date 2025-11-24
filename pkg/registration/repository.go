@@ -59,5 +59,6 @@ func (r *RegistrationRepository) Create(registration entities.Registration) erro
 // }
 
 // func (r *RegistrationRepository) CancelRegistration(registrationID string) error {
+
 // 	return r.db.Where("registration_id = ?", registrationID).Delete(&entities.Registration{}).Error
 // }
