@@ -19,11 +19,11 @@ func (r *RegistrationRepository) Create(registration entities.Registration) erro
 	return r.db.Create(&registration).Error
 }
 
-func (r *RegistrationRepository) GetAll() ([]entities.Registration, error) {
-	var registrations []entities.Registration
-	err := r.db.Preload("Payments").Find(&registrations).Error
-	return registrations, err
-}
+// func (r *RegistrationRepository) GetAll() ([]entities.Registration, error) {
+// 	var registrations []entities.Registration
+// 	err := r.db.Preload("Payments").Find(&registrations).Error
+// 	return registrations, err
+// }
 
 // func (r *RegistrationRepository) GetByID(registrationID string) (entities.Registration, error) {
 // 	var registration entities.Registration
