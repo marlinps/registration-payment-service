@@ -1,53 +1,60 @@
 package entities
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type PaymentMethod string
-type VerificationStatus string
+// ENUMS
+type RegistrationStatus string
+type Gender string
 
 const (
-	PaymentBankTransfer PaymentMethod = "bank_transfer"
-	PaymentEwallet      PaymentMethod = "ewallet"
-	PaymentCash         PaymentMethod = "cash"
-	PaymentOther        PaymentMethod = "other"
+	StatusPending   RegistrationStatus = "pending"
+	StatusPaid      RegistrationStatus = "paid"
+	StatusConfirmed RegistrationStatus = "confirmed"
+	StatusCancelled RegistrationStatus = "cancelled"
+	StatusRejected  RegistrationStatus = "rejected"
 
-	VerificationPending  VerificationStatus = "pending"
-	VerificationApproved VerificationStatus = "approved"
-	VerificationRejected VerificationStatus = "rejected"
+	GenderMale   Gender = "male"
+	GenderFemale Gender = "female"
 )
 
-type Payment struct {
-	PaymentID            uuid.UUID          `gorm:"type:char(36);primaryKey" json:"payment_id"`
-	RegistrationID       uuid.UUID          `gorm:"type:char(36);not null;index:idx_payments_registration" json:"registration_id"`
-	Amount               float64            `gorm:"type:decimal(10,2);not null" json:"amount"`
-	PaymentMethod        PaymentMethod      `gorm:"type:enum('bank_transfer','ewallet','cash','other');default:'bank_transfer'" json:"payment_method"`
-	PaymentDate          time.Time          `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"payment_date"`
-	PaymentProofURL      string             `gorm:"type:varchar(500)" json:"payment_proof_url"`
-	PaymentProofFilename string             `gorm:"type:varchar(255)" json:"payment_proof_filename"`
-	BankName             string             `gorm:"type:varchar(100)" json:"bank_name"`
-	AccountNumber        string             `gorm:"type:varchar(50)" json:"account_number"`
-	AccountHolderName    string             `gorm:"type:varchar(255)" json:"account_holder_name"`
-	VerificationStatus   VerificationStatus `gorm:"type:enum('pending','approved','rejected');default:'pending';index:idx_payments_verification_status" json:"verification_status"`
-	VerifiedBy           *uuid.UUID         `gorm:"type:char(36)" json:"verified_by"`
-	VerifiedAt           *time.Time         `gorm:"type:timestamp null" json:"verified_at"`
-	VerificationNotes    *string            `gorm:"type:text" json:"verification_notes"`
-	RejectionReason      *string            `gorm:"type:text" json:"rejection_reason"`
-	CreatedAt            time.Time          `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt            time.Time          `gorm:"autoUpdateTime" json:"updated_at"`
-
-	// Relasi ke Registration
-	Registration Registration `gorm:"foreignKey:RegistrationID;constraint:OnDelete:CASCADE;" json:"registration"`
+type Registration struct {
+	RegistrationID           uuid.UUID          `gorm:"type:char(36);primaryKey" json:"registration_id"`
+	EventID                  uuid.UUID          `gorm:"type:char(36);not null;index:idx_event_user,unique;index:idx_registrations_event" json:"event_id"`
+	UserID                   *uuid.UUID         `gorm:"type:char(36);index:idx_event_user,unique;index:idx_registrations_user" json:"user_id"`
+	FullName                 string             `gorm:"size:255;not null" json:"full_name"`
+	Gender                   Gender             `gorm:"type:ENUM('male','female');not null" json:"gender"`
+	Phone                    string             `gorm:"size:20;not null" json:"phone"`
+	Email                    string             `gorm:"size:255;not null" json:"email"`
+	Address                  string             `gorm:"type:text" json:"address"`
+	EmergencyContactName     string             `gorm:"size:255" json:"emergency_contact_name"`
+	EmergencyContactPhone    string             `gorm:"size:20" json:"emergency_contact_phone"`
+	EmergencyContactRelation string             `gorm:"size:100" json:"emergency_contact_relation"`
+	SpecialNeeds             string             `gorm:"type:text" json:"special_needs"`
+	RegistrationDate         time.Time          `gorm:"autoCreateTime" json:"registration_date"`
+	Status                   RegistrationStatus `gorm:"type:ENUM('pending','paid','confirmed','cancelled','rejected');default:'pending';index:idx_registrations_status" json:"status"`
+	CancelledAt              *time.Time         `json:"cancelled_at"`
+	CancellationReason       string             `gorm:"type:text" json:"cancellation_reason"`
+	Notes                    string             `gorm:"type:text" json:"notes"`
+	CreatedAt                time.Time          `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt                time.Time          `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
-// BeforeCreate: Generate UUID otomatis
-func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
-	if p.PaymentID == uuid.Nil {
-		p.PaymentID = uuid.New()
+// BeforeCreate: Generate UUID & minimal validation
+func (r *Registration) BeforeCreate(tx *gorm.DB) (err error) {
+	if r.RegistrationID == uuid.Nil {
+		r.RegistrationID = uuid.New()
 	}
-	return
+
+	// Required minimal fields
+	if r.FullName == "" || r.Email == "" || r.Phone == "" {
+		return fmt.Errorf("required fields: full_name, email, and phone cannot be empty")
+	}
+
+	return nil
 }

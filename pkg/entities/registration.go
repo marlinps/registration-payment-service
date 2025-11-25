@@ -25,10 +25,10 @@ const (
 
 type Registration struct {
 	RegistrationID           uuid.UUID          `gorm:"type:char(36);primaryKey" json:"registration_id"`
-	EventID                  uuid.UUID          `gorm:"type:char(36);not null;index:idx_event_user,unique;index:idx_registrations_event;index:idx_event_status,priority:1" json:"event_id"`
-	UserID                   uuid.UUID          `gorm:"type:char(36);not null;index:idx_event_user,unique;index:idx_registrations_user" json:"user_id"`
+	EventID                  uuid.UUID          `gorm:"type:char(36);not null;index:idx_event_user,unique;index:idx_registrations_event" json:"event_id"`
+	UserID                   *uuid.UUID         `gorm:"type:char(36);index:idx_event_user,unique;index:idx_registrations_user" json:"user_id"`
 	FullName                 string             `gorm:"size:255;not null" json:"full_name"`
-	Gender                   Gender             `gorm:"type:enum('male','female');not null" json:"gender"`
+	Gender                   Gender             `gorm:"type:ENUM('male','female');not null" json:"gender"`
 	Phone                    string             `gorm:"size:20;not null" json:"phone"`
 	Email                    string             `gorm:"size:255;not null" json:"email"`
 	Address                  string             `gorm:"type:text" json:"address"`
@@ -37,34 +37,24 @@ type Registration struct {
 	EmergencyContactRelation string             `gorm:"size:100" json:"emergency_contact_relation"`
 	SpecialNeeds             string             `gorm:"type:text" json:"special_needs"`
 	RegistrationDate         time.Time          `gorm:"autoCreateTime" json:"registration_date"`
-	Status                   RegistrationStatus `gorm:"type:enum('pending','paid','confirmed','cancelled','rejected');default:'pending';not null;index:idx_registrations_status;index:idx_event_status,priority:2" json:"status" default:"pending"`
+	Status                   RegistrationStatus `gorm:"type:ENUM('pending','paid','confirmed','cancelled','rejected');default:'pending';index:idx_registrations_status" json:"status"`
 	CancelledAt              *time.Time         `json:"cancelled_at"`
 	CancellationReason       string             `gorm:"type:text" json:"cancellation_reason"`
 	Notes                    string             `gorm:"type:text" json:"notes"`
 	CreatedAt                time.Time          `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt                time.Time          `gorm:"autoUpdateTime" json:"updated_at"`
-
-	// Relasi ke Payment (one-to-many)
-	// Payments []Payment `gorm:"foreignKey:RegistrationID;constraint:OnDelete:CASCADE;" json:"payments"`
 }
 
-// BeforeCreate: Generate UUID & validasi wajib
+// BeforeCreate: Generate UUID & minimal validation
 func (r *Registration) BeforeCreate(tx *gorm.DB) (err error) {
 	if r.RegistrationID == uuid.Nil {
 		r.RegistrationID = uuid.New()
 	}
 
-	if r.EventID == uuid.Nil {
-		r.EventID = uuid.New()
-	}
-
-	if r.UserID == uuid.Nil {
-		r.UserID = uuid.New()
-	}
-
+	// Required minimal fields
 	if r.FullName == "" || r.Email == "" || r.Phone == "" {
 		return fmt.Errorf("required fields: full_name, email, and phone cannot be empty")
 	}
 
-	return
+	return nil
 }

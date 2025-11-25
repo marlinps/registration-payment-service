@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/marlinps/registration-payment-service/api/routes"
 	"github.com/marlinps/registration-payment-service/pkg/entities"
 	"github.com/marlinps/registration-payment-service/pkg/registration"
-
-	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
